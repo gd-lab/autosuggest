@@ -1,0 +1,37 @@
+
+.ac-widget {
+    width: 100%;
+}
+
+.ac-widget .ac-input {
+    width: 79%;
+}
+
+.ac-widget .ac-submit {
+    width: 20%;
+}
+
+.ac-widget .ac-widget-suggest {
+    width: 79%;
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    border: 1px solid #AAA;
+}
+
+.ac-widget .ac-widget-suggest.closed {
+    display: none;
+}
+
+.ac-widget .ac-widget-suggest.opened {
+    display: block;
+}
+
+.ac-widget .ac-item {
+    padding: 2px 4px;
+}
+
+.ac-widget .ac-item:hover {
+    background-color: #ccffcc;
+    cursor: pointer;
+}
