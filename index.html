@@ -28,23 +28,24 @@
             display: table;
         }
 
-        .user-row:hover {
-            background-color: #ccffcc;
-            cursor: pointer;
-        }
-
-        .bottom_margin {
-            margin-bottom: 10px;
-        }
-
         .ac-widget {
             width: 100%;
         }
 
+        .ac-widget .ac-input {
+            width: 79%;
+        }
+
+        .ac-widget .ac-submit {
+            width: 20%;
+        }
+
         .ac-widget .ac-widget-suggest {
+            width: 79%;
             list-style-type: none;
             padding: 0;
             margin: 0;
+            border: 1px solid #AAA;
         }
 
         .ac-widget .ac-widget-suggest.closed {
@@ -55,11 +56,14 @@
             display: block;
         }
 
+        .ac-widget .ac-item {
+            padding: 2px 4px;
+        }
+
         .ac-widget .ac-item:hover {
             background-color: #ccffcc;
             cursor: pointer;
         }
-
 
     </style>
 </head>
@@ -69,41 +73,8 @@
         <div>Loading...</div>
     </div>
 
-
-    <div id="acTemplate" style="display: none">
-        <div class="ac-widget">
-            <div>
-                <input class="ac-widget-input" autocomplete="off">
-                <button class="ac-widget-submit" type="button">Submit</button>
-            </div>
-            <ul class="ac-widget-suggest closed" tabindex="0">
-                <!--<li class="ac-item" tabindex="-1">ActionScript</li>
-                <li class="ac-item" tabindex="-1">AppleScript</li>-->
-            </ul>
-        </div>
-    </div>
-
-
     <div id="container">
     </div>
-
-
-<script type="text/template" id="userTemplate">
-    <li class="list-group-item user-row" data-user-id="<%= user.id %>">
-        <div class="row">
-            <div class="col-xs-4">
-                <%= user.name %>
-            </div>
-            <div class="col-xs-4">
-                <%= user.email %>
-            </div>
-            <div class="col-xs-4">
-                <%= (user.address || {}).city %>
-            </div>
-        </div>
-    </li>
-
-</script>
 
 <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js"></script>
@@ -111,154 +82,6 @@
 
 
 <script>
-
-    function Suggester(options) {
-        var defaultOptions = {
-            maxItems: 8
-        };
-
-        options = _.defaults(options || {}, defaultOptions);
-
-        this._getOptions = function() {
-            return options;
-        }
-
-        var suggestMap = {};
-        var suggestWeightsSorted = [];
-
-        this.setValues = function(values) {
-            suggestMap = values;
-            suggestWeightsSorted = _.sortBy(_.keys(values), function(key) {
-                return -values[key];
-            });
-        }
-
-        this._getSortedValues = function() {
-            return suggestWeightsSorted;
-        }
-    }
-
-    Suggester.prototype.suggestValues = function(text) {
-        if (!text) return null;
-
-        text = text.toLowerCase();
-        var maxItems = this._getOptions().maxItems;
-        var result = [];
-        var vals = this._getSortedValues();
-        for (var i = 0, maxI = vals.length; i < maxI; i++) {
-            var str = vals[i];
-            if (~str.toLowerCase().indexOf(text)) {
-                result.push(str);
-                if (result.length >= maxItems) break;
-            }
-        }
-        return result;
-    }
-
-
-
-    var AutocompleteWidget = (function(options) {
-        var defaultOptions = {
-            inputClass: "ac-input",
-            submitClass: "ac-submit",
-            dialogClass: "ac-dialog",
-            jsonUrl: "https://raw.githubusercontent.com/gd-lab/autosuggest/master/data/data.json",
-            onerror: function() {}
-        };
-
-        options = _.defaults(options || {}, defaultOptions);
-
-        var suggester = new Suggester();
-        (function _loadData(successCb) {
-            $.ajax({
-                type: "GET",
-                dataType: "json",
-                url: options.jsonUrl
-            }).done(function (data) {
-                if (successCb) successCb(data);
-            }).fail(function() {
-                alert("Ajax failed to fetch data");
-                onerror();
-            });
-        })(function(data) {
-            suggester.setValues(data);
-        });
-
-
-        var $el = $('#acTemplate').children().clone();
-
-        var $dialog = $('ul', $el).addClass(options.dialogClass);
-        var $input = $('input', $el).addClass(options.inputClass);
-        var $submit = $('button', $el).addClass(options.submitClass);
-
-
-        var currentTags = [];
-
-        $el.getTags = function() {
-            return currentTags;
-        }
-
-        var currentInputText = "";
-        var onInputChange = _.debounce(function() {
-            var inputText = $input.val();
-            if (currentInputText === inputText) return;
-
-            var tags = inputText.split(",");
-            var valToSuggest = findLastChangedRow(currentTags, tags);
-            console.log(valToSuggest, currentTags, tags);
-            tryToSuggest(valToSuggest);
-            currentTags = tags;
-            currentInputText = inputText;
-        }, 10);
-        $input//.on('keypress', function(e) { if (e.which == 44/*,*/) return false; })
-            .on('change keydown keypress', onInputChange);
-
-        function findLastChangedRow(oldArr, newArr) {
-            var oldArrIdx = oldArr.length;
-            var newArrIdx = newArr.length;
-            while (oldArrIdx >= 0 && newArrIdx >= 0) {
-                if (oldArr[oldArrIdx] != newArr[newArrIdx]) {
-                    return newArr[newArrIdx];
-                }
-                oldArrIdx--;
-                newArrIdx--;
-            }
-            if (newArrIdx >= 0) {
-                return newArr[newArrIdx];
-            }
-            return null;
-        }
-
-        function tryToSuggest(text) {
-            $dialog.hide();
-            if (!text) return;
-
-            text = _.trimLeft(text);
-            if (text.length <= 2) {
-                return;
-            }
-
-            var result = suggester.suggestValues(text);
-            if (!result || !result.length) return;
-
-            _dialogShow(result);
-        }
-
-        function _dialogShow(suggestedValues) {
-            //debugger
-            var html = "";
-            for (var i = 0, maxI = suggestedValues.length; i < maxI; i++) {
-                html += '<li class="ac-item" tabindex="-1">' + suggestedValues[i] + '</li>';
-            }
-            $dialog.html(html).show();
-        }
-
-
-        return $el;
-
-
-    });
-
 
 
 
@@ -275,42 +98,11 @@
             success: function() {}
         });
 
-        var $w = new AutocompleteWidget({
-            inputClass: "input"
-        });
-        $("#container").append($w);
-
-        return;
-
-
-
-        function abc(data) {
-            //debugger
-        }
-
-        loadData("https://raw.githubusercontent.com/gd-lab/autosuggest/master/data/data.json", abc);
-
-        /*$.ajax({
-            type: "GET",
-            url: "http://jsonplaceholder.typicode.com/users"
-        }).done(function (data) {
-            users = data;
-            var renderFn = renderUsersList.bind(this, users);
-            renderFn();
-            $("#searchText").on("keyup", renderFn);
-            $("#searchBtn").on("click", renderFn);
-
-        }).fail(function() {
-            alert("Ajax failed to fetch data");
+        var widget = new AutocompleteWidget({
+            inputClass: "ac-input"
         });
 
-        $("#users").on("click", ".user-row", function() {
-            var userId = $(this).data("user-id");
-            var user = _.find(users, {id: userId});
-            var modalHtml = _.template($("#modalTemplate").html())({user: user});
-            $modal.html(modalHtml);
-            $(".modal", $modal).modal({keyboard: true});
-        });*/
+        $("#container").append(widget.getElement());
 
     });
 
