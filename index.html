@@ -5,30 +5,8 @@
     <title>Sample widget</title>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/3.0.3/normalize.min.css">
+    <link rel="stylesheet" href="css/app.css">
     <link rel="stylesheet" href="css/autocomplete.css">
-
-    <style>
-        body {
-            margin: 10px
-        }
-
-        #loading {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 99999;
-            background-color: rgba(200,200,200,.5)
-        }
-
-        #loading > div {
-            position: relative;
-            top: 50%;
-            margin: auto;
-            display: table;
-        }
-    </style>
 </head>
 <body>
 
@@ -39,36 +17,7 @@
     <div id="container">
     </div>
 
-<script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js"></script>
-<script src="src/autocomplete.js"></script>
-
-
-<script>
-
-    $(document).ready(function() {
-
-        $.ajaxSetup({
-            beforeSend: function() {
-               $('#loading').show();
-            },
-            complete: function(){
-               $('#loading').hide();
-            },
-            success: function() {}
-        });
-
-        var widget = new AutocompleteWidget({
-            inputClass: "ac-input",
-            sendToUrl: "http://www.somewhere.xyz/data/put"
-        });
-
-        $("#container").append(widget.getElement());
-
-    });
-
-</script>
-
+    <script data-main="src/app" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.20/require.min.js"></script>
 
 </body>
 </html>
