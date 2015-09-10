@@ -1,4 +1,4 @@
-define(["jquery", "./autocomplete/autocomplete"], function ($, AutocompleteWidget) {
+define(['jquery', './autocomplete/autocomplete'], function ($, AutocompleteWidget) {
 
     $(document).ready(function() {
 
@@ -13,11 +13,11 @@ define(["jquery", "./autocomplete/autocomplete"], function ($, AutocompleteWidge
         });
 
         var widget = new AutocompleteWidget({
-            inputClass: "ac-input",
-            sendToUrl: "http://www.somewhere.xyz/data/put"
+            inputClass: 'ac-input',
+            sendToUrl: 'http://www.somewhere.xyz/data/put'
         });
 
-        $("#container").append(widget.getElement());
+        $('#container').append(widget.getElement());
 
     });
 
