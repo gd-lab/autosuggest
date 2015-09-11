@@ -1,4 +1,5 @@
-define(['lodash'], function (_) {
+angular.module('suggester', [])
+    .factory('Suggester', function() {
 
     /**
      * @constructor

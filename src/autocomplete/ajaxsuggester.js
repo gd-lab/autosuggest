@@ -1,4 +1,5 @@
-define(['jquery', 'lodash', './suggester'], function ($, _, Suggester) {
+angular.module('ajaxsuggester', ['suggester'])
+    .factory('AjaxSuggester', function(Suggester) {
 
     /**
      * @constructor

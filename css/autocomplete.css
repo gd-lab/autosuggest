@@ -4,27 +4,19 @@
 }
 
 .ac-widget .ac-input {
-    width: 79%;
+    width: 75%;
 }
 
 .ac-widget .ac-submit {
     width: 20%;
 }
 
-.ac-widget .ac-widget-suggest {
-    width: 79%;
+.ac-widget .ac-dialog {
+    width: 75%;
     list-style-type: none;
     padding: 0;
     margin: 0;
     border: 1px solid #AAA;
-}
-
-.ac-widget .ac-widget-suggest.closed {
-    display: none;
-}
-
-.ac-widget .ac-widget-suggest.opened {
-    display: block;
 }
 
 .ac-widget .ac-item {

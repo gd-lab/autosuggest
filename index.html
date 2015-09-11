@@ -8,16 +8,26 @@
     <link rel="stylesheet" href="css/app.css">
     <link rel="stylesheet" href="css/autocomplete.css">
 </head>
-<body>
-
-    <div id="loading">
-        <div>Ajax operation is in progress...</div>
-    </div>
+<body ng-app="MyApp">
 
     <div id="container">
+
+        <gd-autocomplete input-class="ac-input"
+                         json-url="https://raw.githubusercontent.com/gd-lab/autosuggest/master/data/data.json"
+                         send-to-url="http://www.somewhere.xyz/data/put">
+        </gd-autocomplete>
+
     </div>
 
-    <script data-main="src/app" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.20/require.min.js"></script>
+<script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.5/angular-resource.min.js"></script>
+
+<script src="src/autocomplete/suggester.js"></script>
+<script src="src/autocomplete/ajaxsuggester.js"></script>
+<script src="src/autocomplete/autocomplete.js"></script>
+<script src="src/app.js"></script>
 
 </body>
 </html>

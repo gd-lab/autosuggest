@@ -1,35 +1,50 @@
-define(['jquery', 'lodash', './ajaxsuggester', './dialog', './input', './submit'],
-        function ($, _, AjaxSuggester, Dialog, TextInput, Submitter) {
+(function() { 
 
-    var widgetHtml = '<div class="ac-widget"><div></div></div>';
+var template = '<div class="ac-widget">\
+    <div>\
+        <input type="text" class="{{inputClass}}" ng-model="inputText" autocomplete="off" ng-change="onInputChange()">\
+        <button type="button" class="{{submitClass}}" ng-click="onSubmit()">Submit</button>\
+    </div>\
+    <ul class="{{dialogClass}}" ng-hide="isDialogClosed" tabindex="0">\
+        <li class="ac-item" tabindex="-1" ng-repeat="tag in tags" ng-click="onSelect(tag)">{{tag}}</li>\
+    </ul>\
+</div>';
 
 
-    /**
-     * @constructor
-     * @param {object=} options - options
-     * @param {string=} options.inputClass - class for input control
-     * @param {string=} options.submitClass - class for submit button
-     * @param {string=} options.dialogClass - class for popup dialog
-     * @param {string=} options.jsonUrl - url to read a list of words/weghts from
-     * @param {string=} options.sendToUrl - url to send result (after submit button click)
-     * @param {function=} options.onsendsuccess - callback after successful result post
-     * @param {function=} options.onerror - callback for any error
-     */
-    function AutocompleteWidget(options) {
+var app = angular.module('autocomplete', ['ajaxsuggester'])
+    .directive('gdAutocomplete', function(AjaxSuggester) {
+
+
+    function controller($scope) {
+        $scope.inputText = "ap";
+        $scope.tags = [];
+        $scope.isDialogClosed = true;
+    }
+
+
+    function link($scope, element, attrs, controllers) {
         var defaultOptions = {
             inputClass: 'ac-input',
             submitClass: 'ac-submit',
             dialogClass: 'ac-dialog',
-            jsonUrl: 'https://raw.githubusercontent.com/gd-lab/autosuggest/master/data/data.json',
-            sendToUrl: 'http://www.somewhere.xyz/data/put',
-            onsendsuccess: function() {},
-            onerror: function() {}
+            jsonUrl: '',
+            sendToUrl: ''
+            //onsendsuccess: function() {},
+            //onerror: function() {}
         };
 
-        options = _.defaults(options || {}, defaultOptions);
+        var options = _.defaults(attrs || {}, defaultOptions);
 
-        var me = this;
+        $scope.inputClass = options.inputClass;
+        $scope.submitClass = options.submitClass;
+        $scope.dialogClass = options.dialogClass;
 
+        function focusInput() {
+            if (!focusInput._ctrl) focusInput._ctrl = $('input', element);
+            focusInput._ctrl.focus();
+        }
+
+        focusInput();
 
         // initialize AjaxSuggester with data from provided url:
         var suggester = new AjaxSuggester({
@@ -37,66 +52,67 @@ define(['jquery', 'lodash', './ajaxsuggester', './dialog', './input', './submit'
             onerror: options.onerror
         });
 
-        this.getTags = function() {
-            return suggester.parseText(input.getValue());
+        $scope.getTags = function() {
+            var result = suggester.parseText($scope.inputText);
+            console.table(result);
+            return result;
         };
 
+        $scope.onInputChange = function() {
+            $scope.isDialogClosed = true;
+            if (!this.inputText) return;
 
-        var input = new TextInput({
-            class: options.inputClass,
-            onchange: function tryToSuggest(text) {
-                dialog.hide();
-                if (!text) return;
-
-                text = _.trimLeft(text);
-                var result = suggester.suggestValues(text);
-                if (result && result.length)
-                    dialog.show(result);
+            var text = _.trimLeft(this.inputText);
+            var result = suggester.suggestValues(text);
+            if (result && result.length) {
+                $scope.tags = result;
+                $scope.isDialogClosed = false;
             }
-        });
-
-
-        var submit = new Submitter({
-            class: options.submitClass,
-            sendToUrl: options.sendToUrl,
-            onsendsuccess: function() {
-                dialog.hide();
-                options.onsendsuccess(arguments);
-            },
-            onerror: function() {
-                dialog.hide();
-                options.onerror(arguments);
-            },
-            getData: function() {
-                var result = me.getTags();
-                console.table(result);
-                return result;
-            }
-        });
-
-
-        var dialog = new Dialog({
-            class: options.dialogClass,
-            onselect: function(text) {
-                input.replaceLastValue(text);
-                input.getElement().focus();
-                console.table(me.getTags());
-            }
-        });
-
-
-        // construct the widget finally:
-        var rootCtrl = $(widgetHtml);
-        this.getElement = function() {
-            return rootCtrl;
         };
 
-        $('div', rootCtrl)
-            .append(input.getElement())
-            .append(submit.getElement());
-        rootCtrl.append(dialog.getElement());
-    };
+        var replaceLastValue = function(value) {
+            var inputText = $scope.inputText;
 
-    return AutocompleteWidget;
+            var lastWordIndex = inputText.lastIndexOf(' ');
+            if (~lastWordIndex) {
+                inputText = inputText.substr(0, lastWordIndex + 1) + value;
+            } else {
+                inputText = value;
+            }
 
+            $scope.inputText = inputText;
+        };
+
+        $scope.onSelect = function(tag) {
+            replaceLastValue(tag);
+            focusInput();
+            //console.table(this.getTags());
+            $scope.isDialogClosed = true;
+        };
+
+        $scope.onSubmit = function() {
+            $scope.isDialogClosed = true;
+            $.ajax({
+                type: 'POST',
+                dataType: 'json',
+                url: options.sendToUrl,
+                data: JSON.stringify(this.getTags())
+            }).done(function (data) {
+                //options.onsendsuccess(data);
+            }).fail(function() {
+                alert('Ajax failed to post data');
+                //options.onerror();
+            });
+        };
+
+    }
+
+    return {
+        restrict: 'E',
+        template: template,
+        scope: {},
+        link: link,
+        controller: controller
+    }; 
 });
+})();
