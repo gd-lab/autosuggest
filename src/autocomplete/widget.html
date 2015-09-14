@@ -1,0 +1,9 @@
+<div class="ac-widget">
+    <div>
+        <input type="text" class="{{inputClass}}" ng-model="inputText" autocomplete="off" ng-change="onInputChange()">
+        <button type="button" class="{{submitClass}}" ng-click="onSubmit()">Submit</button>
+    </div>
+    <ul class="{{dialogClass}}" ng-hide="isDialogClosed" tabindex="0">
+        <li class="ac-item" tabindex="-1" ng-repeat="tag in tags" ng-click="onSelect(tag)">{{tag}}</li>
+    </ul>
+</div>

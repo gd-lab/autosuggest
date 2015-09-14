@@ -1,22 +1,11 @@
 (function() { 
 
-var template = '<div class="ac-widget">\
-    <div>\
-        <input type="text" class="{{inputClass}}" ng-model="inputText" autocomplete="off" ng-change="onInputChange()">\
-        <button type="button" class="{{submitClass}}" ng-click="onSubmit()">Submit</button>\
-    </div>\
-    <ul class="{{dialogClass}}" ng-hide="isDialogClosed" tabindex="0">\
-        <li class="ac-item" tabindex="-1" ng-repeat="tag in tags" ng-click="onSelect(tag)">{{tag}}</li>\
-    </ul>\
-</div>';
-
-
 var app = angular.module('autocomplete', ['ajaxsuggester'])
     .directive('gdAutocomplete', function(AjaxSuggester) {
 
 
     function controller($scope) {
-        $scope.inputText = "ap";
+        $scope.inputText = '';
         $scope.tags = [];
         $scope.isDialogClosed = true;
     }
@@ -109,7 +98,7 @@ var app = angular.module('autocomplete', ['ajaxsuggester'])
 
     return {
         restrict: 'E',
-        template: template,
+        templateUrl: './src/autocomplete/widget.html',
         scope: {},
         link: link,
         controller: controller
