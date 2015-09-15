@@ -10,6 +10,7 @@ angular.module('ajaxsuggester', ['suggester'])
 
         var defaultOptions = {
             jsonUrl: '',
+            onsuccess: function() {},
             onerror: function() {}
         };
         options = _.defaults(options || {}, defaultOptions);
@@ -21,6 +22,7 @@ angular.module('ajaxsuggester', ['suggester'])
             url: options.jsonUrl
         }).done(function (data) {
             me.setValues(data);
+            options.onsuccess(data);
         }).fail(function() {
             alert('Ajax failed to fetch data');
             options.onerror();

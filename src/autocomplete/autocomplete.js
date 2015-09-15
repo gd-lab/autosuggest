@@ -17,9 +17,9 @@ var app = angular.module('autocomplete', ['ajaxsuggester'])
             submitClass: 'ac-submit',
             dialogClass: 'ac-dialog',
             jsonUrl: '',
-            sendToUrl: ''
-            //onsendsuccess: function() {},
-            //onerror: function() {}
+            sendToUrl: '',
+            onsendsuccess: function() {},
+            onerror: function() {}
         };
 
         var options = _.defaults(attrs || {}, defaultOptions);
@@ -38,6 +38,7 @@ var app = angular.module('autocomplete', ['ajaxsuggester'])
         // initialize AjaxSuggester with data from provided url:
         var suggester = new AjaxSuggester({
             jsonUrl: options.jsonUrl,
+            onsuccess: options.onsendsuccess,
             onerror: options.onerror
         });
 
@@ -98,8 +99,10 @@ var app = angular.module('autocomplete', ['ajaxsuggester'])
 
     return {
         restrict: 'E',
-        templateUrl: './src/autocomplete/widget.html',
-        scope: {},
+        templateUrl: 'src/autocomplete/widget.html',
+        scope: {
+            //'onJsonLoad': '&'
+        },
         link: link,
         controller: controller
     }; 
