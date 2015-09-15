@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "A simple autosuggest widget for AngularJS",
   "license": "MIT",
+  "private": true,
   "//": {
     "angular-route": "~1.4.0",
     "angular-loader": "~1.4.0",

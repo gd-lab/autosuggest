@@ -1,5 +1,6 @@
 {
   "name": "autosuggest-angular",
+  "private": true,
   "version": "0.1.0",
   "description": "A simple autosuggest widget for AngularJS",
   "license": "MIT",
