@@ -29,8 +29,8 @@ var app = angular.module('autocomplete', ['ajaxsuggester'])
         $scope.dialogClass = options.dialogClass;
 
         function focusInput() {
-            if (!focusInput._ctrl) focusInput._ctrl = $('input', element);
-            focusInput._ctrl.focus();
+            if (!focusInput._ctrl) focusInput._ctrl = element.find('input');
+            focusInput._ctrl[0].focus();
         }
 
         focusInput();
