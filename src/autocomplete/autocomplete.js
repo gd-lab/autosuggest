@@ -1,7 +1,7 @@
 (function() { 
 
 var app = angular.module('autocomplete', ['ajaxsuggester'])
-    .directive('gdAutocomplete', function(AjaxSuggester) {
+    .directive('gdAutocomplete', function(AjaxSuggester, $http) {
 
 
     function controller($scope) {
@@ -82,17 +82,13 @@ var app = angular.module('autocomplete', ['ajaxsuggester'])
 
         $scope.onSubmit = function() {
             $scope.isDialogClosed = true;
-            $.ajax({
-                type: 'POST',
-                dataType: 'json',
-                url: options.sendToUrl,
-                data: JSON.stringify(this.getTags())
-            }).done(function (data) {
-                //options.onsendsuccess(data);
-            }).fail(function() {
-                alert('Ajax failed to post data');
-                //options.onerror();
-            });
+            $http.post(options.sendToUrl, this.getTags()).
+                then(function(response) {
+                    //options.onsendsuccess(data);
+                }, function(response) {
+                    alert('Ajax failed to post data');
+                    //options.onerror();
+                });
         };
 
     }

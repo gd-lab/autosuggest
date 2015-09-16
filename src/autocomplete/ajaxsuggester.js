@@ -1,5 +1,5 @@
 angular.module('ajaxsuggester', ['suggester'])
-    .factory('AjaxSuggester', function(Suggester) {
+    .factory('AjaxSuggester', function(Suggester, $http) {
 
     /**
      * @constructor
@@ -16,17 +16,15 @@ angular.module('ajaxsuggester', ['suggester'])
         options = _.defaults(options || {}, defaultOptions);
 
         var me = this;
-        $.ajax({
-            type: 'GET',
-            dataType: 'json',
-            url: options.jsonUrl
-        }).done(function (data) {
-            me.setValues(data);
-            options.onsuccess(data);
-        }).fail(function() {
-            alert('Ajax failed to fetch data');
-            options.onerror();
-        });
+        $http.get(options.jsonUrl).
+            then(function(response) {
+                me.setValues(response.data);
+                options.onsuccess(response);
+            }, function(response) {
+                alert('Ajax failed to fetch data');
+                options.onerror();
+            });
+
     }
 
     AjaxSuggester.prototype = Object.create(Suggester.prototype);
