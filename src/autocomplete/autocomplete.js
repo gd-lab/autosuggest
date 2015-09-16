@@ -1,11 +1,11 @@
 (function() { 
 
 var app = angular.module('autocomplete', ['ajaxsuggester'])
-    .directive('gdAutocomplete', function(AjaxSuggester, $http) {
+    .directive('gdAutocomplete', function(AjaxSuggester, $http, $window) {
 
 
     function controller($scope) {
-        $scope.inputText = '';
+        //$scope.inputText = '';
         $scope.suggestTags = [];
         $scope.isDialogClosed = true;
     }
@@ -74,7 +74,6 @@ var app = angular.module('autocomplete', ['ajaxsuggester'])
         $scope.onSelect = function(tag) {
             replaceLastValue(tag);
             focusInput();
-            //console.table(this.getTags());
             $scope.isDialogClosed = true;
         };
 
@@ -84,7 +83,7 @@ var app = angular.module('autocomplete', ['ajaxsuggester'])
                 then(function(response) {
                     $scope.onPostSuccess(response);
                 }, function(response) {
-                    alert('Ajax failed to post data');
+                    $window.alert('Ajax failed to post data');
                     $scope.onPostError(response);
                 });
         };
@@ -95,6 +94,7 @@ var app = angular.module('autocomplete', ['ajaxsuggester'])
         restrict: 'E',
         templateUrl: 'src/autocomplete/widget.html',
         scope: {
+            'inputText': '@initialValue',
             'onPostSuccess': '&',
             'onPostError': '&',
             'onGetJsonSuccess': '&',
