@@ -1,5 +1,5 @@
 angular.module('ajaxsuggester', ['suggester'])
-    .factory('AjaxSuggester', function(Suggester, $http) {
+    .factory('AjaxSuggester', function(Suggester, $http, $window) {
 
     /**
      * @constructor
@@ -21,7 +21,7 @@ angular.module('ajaxsuggester', ['suggester'])
                 me.setValues(response.data);
                 options.onsuccess(response);
             }, function(response) {
-                alert('Ajax failed to fetch data');
+                $window.alert('Ajax failed to fetch data');
                 options.onerror();
             });
 

@@ -6,7 +6,7 @@ var app = angular.module('autocomplete', ['ajaxsuggester'])
 
     function controller($scope) {
         $scope.inputText = '';
-        $scope.tags = [];
+        $scope.suggestTags = [];
         $scope.isDialogClosed = true;
     }
 
@@ -17,9 +17,7 @@ var app = angular.module('autocomplete', ['ajaxsuggester'])
             submitClass: 'ac-submit',
             dialogClass: 'ac-dialog',
             jsonUrl: '',
-            sendToUrl: '',
-            onsendsuccess: function() {},
-            onerror: function() {}
+            sendToUrl: ''
         };
 
         var options = _.defaults(attrs || {}, defaultOptions);
@@ -38,8 +36,8 @@ var app = angular.module('autocomplete', ['ajaxsuggester'])
         // initialize AjaxSuggester with data from provided url:
         var suggester = new AjaxSuggester({
             jsonUrl: options.jsonUrl,
-            onsuccess: options.onsendsuccess,
-            onerror: options.onerror
+            onsuccess: $scope.onGetJsonSuccess,
+            onerror: $scope.onGetJsonError
         });
 
         $scope.getTags = function() {
@@ -55,7 +53,7 @@ var app = angular.module('autocomplete', ['ajaxsuggester'])
             var text = _.trimLeft(this.inputText);
             var result = suggester.suggestValues(text);
             if (result && result.length) {
-                $scope.tags = result;
+                $scope.suggestTags = result;
                 $scope.isDialogClosed = false;
             }
         };
@@ -84,10 +82,10 @@ var app = angular.module('autocomplete', ['ajaxsuggester'])
             $scope.isDialogClosed = true;
             $http.post(options.sendToUrl, this.getTags()).
                 then(function(response) {
-                    //options.onsendsuccess(data);
+                    $scope.onPostSuccess(response);
                 }, function(response) {
                     alert('Ajax failed to post data');
-                    //options.onerror();
+                    $scope.onPostError(response);
                 });
         };
 
@@ -97,7 +95,10 @@ var app = angular.module('autocomplete', ['ajaxsuggester'])
         restrict: 'E',
         templateUrl: 'src/autocomplete/widget.html',
         scope: {
-            //'onJsonLoad': '&'
+            'onPostSuccess': '&',
+            'onPostError': '&',
+            'onGetJsonSuccess': '&',
+            'onGetJsonError': '&'
         },
         link: link,
         controller: controller
